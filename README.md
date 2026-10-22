@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 # SpendSense – Personal Expense Tracker
 
@@ -46,3 +47,11 @@ Open http://127.0.0.1:8000/ in your browser.
 
 ## License
 This project uses the MIT License.
+=======
+# SpendSense
+>>>>>>> d4e5dee2d5ca5e72b71a9c7977c08245f859653b
+<<<<<<< HEAD
+...local README content...
+=======
+...GitHub README content...
+>>>>>>> origin/main
