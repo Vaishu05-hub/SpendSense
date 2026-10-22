@@ -1,0 +1,978 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpendSense | Smart Money Management</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #202938;
+            line-height: 1.6;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        .navbar {
+            background: #111827;
+            color: white;
+            padding: 18px 6%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .brand {
+            color: white;
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        .nav-link {
+            color: white;
+            background: #374151;
+            padding: 9px 16px;
+            border-radius: 8px;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1250px;
+            margin: 28px auto;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #172554, #2563eb);
+            color: white;
+            padding: 35px;
+            border-radius: 18px;
+            margin-bottom: 28px;
+        }
+
+        .hero h1 {
+            font-size: 30px;
+            margin-bottom: 8px;
+        }
+
+        .hero p {
+            color: #dbeafe;
+        }
+
+        .section {
+            background: white;
+            padding: 24px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+        }
+
+        .section h2 {
+            font-size: 21px;
+            margin-bottom: 18px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 22px;
+            border-radius: 14px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+            border-top: 4px solid #2563eb;
+            overflow-wrap: anywhere;
+        }
+
+        .summary-card p {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .summary-card h2 {
+            font-size: 23px;
+            margin-top: 8px;
+        }
+
+        .income {
+            border-top-color: #16a34a;
+        }
+
+        .expense {
+            border-top-color: #dc2626;
+        }
+
+        .balance {
+            border-top-color: #2563eb;
+        }
+
+        .monthly {
+            border-top-color: #9333ea;
+        }
+
+        .positive {
+            color: #15803d;
+        }
+
+        .negative {
+            color: #dc2626;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 15px;
+            background: white;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: 2px solid #93c5fd;
+            border-color: #2563eb;
+        }
+
+        button,
+        .button {
+            border: none;
+            border-radius: 8px;
+            padding: 11px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .primary-btn {
+            background: #2563eb;
+            color: white;
+        }
+
+        .secondary-btn {
+            background: #e5e7eb;
+            color: #111827;
+        }
+
+        .delete-btn {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .success-btn {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .messages {
+            margin-bottom: 20px;
+        }
+
+        .message {
+            padding: 12px 16px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .message.error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .budget-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .budget-card {
+            border: 1px solid #e5e7eb;
+            padding: 18px;
+            border-radius: 12px;
+            min-width: 0;
+        }
+
+        .budget-heading {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .progress-track {
+            height: 12px;
+            width: 100%;
+            background: #e5e7eb;
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 12px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: #2563eb;
+            border-radius: 20px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-fill.warning {
+            background: #f59e0b;
+        }
+
+        .progress-fill.over-budget {
+            background: #dc2626;
+        }
+
+        .muted {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            margin: 0 auto;
+            min-height: 280px;
+        }
+
+        .filter-form {
+            display: grid;
+            grid-template-columns: 2fr 1fr auto auto;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .transaction-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .transaction-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 18px;
+        }
+
+        .transaction-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+
+        .transaction-title {
+            font-size: 17px;
+            font-weight: bold;
+            overflow-wrap: anywhere;
+        }
+
+        .transaction-amount {
+            font-size: 19px;
+            font-weight: bold;
+        }
+
+        .transaction-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 14px;
+        }
+
+        .edit-form {
+            display: none;
+            margin-top: 16px;
+            padding: 16px;
+            background: #f9fafb;
+            border-radius: 10px;
+        }
+
+        .edit-form.visible {
+            display: block;
+        }
+
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .report-table th,
+        .report-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+        }
+
+        .report-table th {
+            background: #f9fafb;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 25px;
+            color: #6b7280;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #6b7280;
+        }
+
+        @media (max-width: 900px) {
+            .summary-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .budget-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                width: 94%;
+                margin: 18px auto;
+            }
+
+            .hero {
+                padding: 24px;
+            }
+
+            .hero h1 {
+                font-size: 25px;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group.full {
+                grid-column: auto;
+            }
+
+            .filter-form {
+                grid-template-columns: 1fr;
+            }
+
+            .section {
+                padding: 17px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <a class="brand" href="{% url 'home' %}">SpendSense</a>
+        <a class="nav-link" href="/admin/">Admin Login</a>
+    </nav>
+
+    <main class="container">
+
+        <section class="hero">
+            <h1>Smart Money Management</h1>
+            <p>Understand your money. Make smarter decisions.</p>
+            <p>Track your income and expenses, monitor budgets, and understand your spending habits.</p>
+        </section>
+
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="message {% if message.tags == 'error' %}error{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- Financial Summary -->
+        <section class="summary-grid">
+
+            <div class="summary-card balance">
+                <p>Available Balance</p>
+                <h2 class="{% if balance < 0 %}negative{% else %}positive{% endif %}">
+                    ₹{{ balance|floatformat:2 }}
+                </h2>
+            </div>
+
+            <div class="summary-card income">
+                <p>Total Income</p>
+                <h2 class="positive">₹{{ total_income|floatformat:2 }}</h2>
+            </div>
+
+            <div class="summary-card expense">
+                <p>Total Expenses</p>
+                <h2 class="negative">₹{{ total_expense|floatformat:2 }}</h2>
+            </div>
+
+            <div class="summary-card monthly">
+                <p>This Month's Expenses</p>
+                <h2>₹{{ monthly_expense|floatformat:2 }}</h2>
+            </div>
+
+        </section>
+
+        <!-- Budget Management -->
+        <section class="section">
+            <h2>Monthly Budget Overview</h2>
+
+            {% if budget_data %}
+                <div class="budget-grid">
+                    {% for budget in budget_data %}
+                        <div class="budget-card">
+
+                            <div class="budget-heading">
+                                <strong>{{ budget.category }}</strong>
+                                <span class="muted budget-percent"
+                                      data-spent="{{ budget.spent }}"
+                                      data-limit="{{ budget.limit }}">
+                                    Calculating...
+                                </span>
+                            </div>
+
+                            <p>
+                                Spent:
+                                <strong>₹{{ budget.spent|floatformat:2 }}</strong>
+                            </p>
+
+                            <p>
+                                Budget:
+                                ₹{{ budget.limit|floatformat:2 }}
+                            </p>
+
+                            <div class="progress-track"
+                                 role="progressbar"
+                                 aria-label="{{ budget.category }} budget usage"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"
+                                 aria-valuenow="0">
+                                <div class="progress-fill"
+                                     data-spent="{{ budget.spent }}"
+                                     data-limit="{{ budget.limit }}">
+                                </div>
+                            </div>
+
+                            <p>
+                                Remaining:
+                                <strong class="{% if budget.remaining < 0 %}negative{% else %}positive{% endif %}">
+                                    ₹{{ budget.remaining|floatformat:2 }}
+                                </strong>
+                            </p>
+
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="empty-state">
+                    No budgets created for this month yet.
+                    You can add a budget from the Django Admin page.
+                </p>
+            {% endif %}
+
+            <p class="muted" style="margin-top: 16px;">
+                To manage budgets, open Admin Login → Budgets.
+            </p>
+        </section>
+
+        <!-- Category Chart -->
+        <section class="section">
+            <h2>Category-wise Expense Analysis</h2>
+
+            {% if category_expenses %}
+                <div class="chart-container">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            {% else %}
+                <p class="empty-state">
+                    Add an expense transaction to see your category chart.
+                </p>
+            {% endif %}
+        </section>
+
+        <!-- Monthly Report -->
+        <section class="section">
+            <h2>Monthly Expense Report</h2>
+
+            {% if monthly_report %}
+                <div class="table-wrapper">
+                    <table class="report-table">
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Total Expenses</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for report in monthly_report %}
+                                <tr>
+                                    <td>{{ report.month|date:"F Y" }}</td>
+                                    <td>₹{{ report.total|floatformat:2 }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="empty-state">No monthly expense records available.</p>
+            {% endif %}
+        </section>
+
+        <!-- Add Transaction -->
+        <section class="section">
+            <h2>Add New Transaction</h2>
+
+            <form method="POST" action="{% url 'add_transaction' %}">
+                {% csrf_token %}
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label for="transaction_type">Transaction Type</label>
+                        <select id="transaction_type"
+                                name="transaction_type"
+                                required>
+                            <option value="">Select type</option>
+                            <option value="INCOME">Income</option>
+                            <option value="EXPENSE">Expense</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category">Category</label>
+                        <select id="category" name="category" required>
+                            <option value="">Select category</option>
+                            {% for category in categories %}
+                                <option value="{{ category.id }}"
+                                        data-type="{{ category.category_type }}">
+                                    {{ category.name }}
+                                    ({{ category.get_category_type_display }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="amount">Amount (₹)</label>
+                        <input type="number"
+                               id="amount"
+                               name="amount"
+                               min="0.01"
+                               step="0.01"
+                               placeholder="Enter amount"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <input type="text"
+                               id="description"
+                               name="description"
+                               maxlength="200"
+                               placeholder="e.g. Lunch or Monthly Salary"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="transaction_date">Transaction Date</label>
+                        <input type="date"
+                               id="transaction_date"
+                               name="transaction_date"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="payment_method">Payment Method</label>
+                        <select id="payment_method"
+                                name="payment_method"
+                                required>
+                            <option value="UPI">UPI</option>
+                            <option value="CASH">Cash</option>
+                            <option value="CARD">Card</option>
+                            <option value="BANK">Bank Transfer</option>
+                            <option value="OTHER">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group full">
+                        <button type="submit" class="primary-btn">
+                            Add Transaction
+                        </button>
+                    </div>
+
+                </div>
+            </form>
+        </section>
+
+        <!-- Transaction Search and Filter -->
+        <section class="section">
+            <h2>Recent Transactions</h2>
+
+            <form method="GET" action="{% url 'home' %}" class="filter-form">
+                <input type="search"
+                       name="search"
+                       value="{{ search_query }}"
+                       placeholder="Search description or category">
+
+                <select name="type">
+                    <option value="">All Transactions</option>
+                    <option value="INCOME"
+                        {% if type_filter == "INCOME" %}selected{% endif %}>
+                        Income
+                    </option>
+                    <option value="EXPENSE"
+                        {% if type_filter == "EXPENSE" %}selected{% endif %}>
+                        Expenses
+                    </option>
+                </select>
+
+                <button type="submit" class="primary-btn">Search</button>
+                <a href="{% url 'home' %}" class="button secondary-btn">Reset</a>
+            </form>
+
+            {% if transactions %}
+                <div class="transaction-list">
+
+                    {% for transaction in transactions %}
+                        <article class="transaction-card">
+
+                            <div class="transaction-top">
+                                <div>
+                                    <div class="transaction-title">
+                                        {{ transaction.description }}
+                                    </div>
+
+                                    <p class="muted">
+                                        {{ transaction.category.name }}
+                                        ·
+                                        {{ transaction.transaction_date|date:"d M Y" }}
+                                    </p>
+
+                                    <p class="muted">
+                                        Payment:
+                                        {{ transaction.get_payment_method_display }}
+                                    </p>
+
+                                    <p class="muted">
+                                        Type:
+                                        {{ transaction.get_transaction_type_display }}
+                                    </p>
+                                </div>
+
+                                <div class="transaction-amount
+                                    {% if transaction.transaction_type == 'INCOME' %}
+                                        positive
+                                    {% else %}
+                                        negative
+                                    {% endif %}">
+                                    {% if transaction.transaction_type == "INCOME" %}+{% else %}-{% endif %}₹{{ transaction.amount|floatformat:2 }}
+                                </div>
+                            </div>
+
+                            <div class="transaction-actions">
+                                <button type="button"
+                                        class="secondary-btn edit-toggle"
+                                        data-transaction-id="{{ transaction.id }}">
+                                    Edit
+                                </button>
+
+                                <form method="POST"
+                                      action="{% url 'delete_transaction' transaction.id %}"
+                                      onsubmit="return confirm('Are you sure you want to delete this transaction?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="delete-btn">
+                                        Delete
+                                    </button>
+                                </form>
+                            </div>
+
+                            <!-- Edit Transaction Form -->
+                            <div class="edit-form"
+                                 id="edit-form-{{ transaction.id }}">
+
+                                <form method="POST"
+                                      action="{% url 'edit_transaction' transaction.id %}">
+                                    {% csrf_token %}
+
+                                    <div class="form-grid">
+
+                                        <div class="form-group">
+                                            <label for="edit-amount-{{ transaction.id }}">
+                                                Amount (₹)
+                                            </label>
+
+                                            <input type="number"
+                                                   id="edit-amount-{{ transaction.id }}"
+                                                   name="amount"
+                                                   min="0.01"
+                                                   step="0.01"
+                                                   value="{{ transaction.amount }}"
+                                                   required>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="edit-description-{{ transaction.id }}">
+                                                Description
+                                            </label>
+
+                                            <input type="text"
+                                                   id="edit-description-{{ transaction.id }}"
+                                                   name="description"
+                                                   maxlength="200"
+                                                   value="{{ transaction.description }}"
+                                                   required>
+                                        </div>
+
+                                        <div class="form-group full">
+                                            <button type="submit"
+                                                    class="success-btn">
+                                                Save Changes
+                                            </button>
+                                        </div>
+
+                                    </div>
+                                </form>
+                            </div>
+
+                        </article>
+                    {% endfor %}
+
+                </div>
+            {% else %}
+                <p class="empty-state">
+                    No transactions found. Add a transaction above to get started.
+                </p>
+            {% endif %}
+        </section>
+
+    </main>
+
+    <footer>
+        © 2026 SpendSense | Personal Expense Tracker
+    </footer>
+
+    <script>
+        // Set today's date as the default transaction date.
+        const dateInput = document.getElementById("transaction_date");
+
+        if (dateInput && !dateInput.value) {
+            const now = new Date();
+            const localDate = new Date(
+                now.getTime() - now.getTimezoneOffset() * 60000
+            ).toISOString().slice(0, 10);
+
+            dateInput.value = localDate;
+        }
+
+        // Show categories matching the selected transaction type.
+        const typeSelect = document.getElementById("transaction_type");
+        const categorySelect = document.getElementById("category");
+
+        if (typeSelect && categorySelect) {
+            const categoryOptions = Array.from(categorySelect.options);
+
+            function filterCategories() {
+                const selectedType = typeSelect.value;
+                let selectedCategoryStillValid = false;
+
+                categoryOptions.forEach(function(option, index) {
+                    if (index === 0) {
+                        option.hidden = false;
+                        return;
+                    }
+
+                    const matches =
+                        !selectedType ||
+                        option.dataset.type === selectedType;
+
+                    option.hidden = !matches;
+
+                    if (
+                        matches &&
+                        option.value === categorySelect.value
+                    ) {
+                        selectedCategoryStillValid = true;
+                    }
+                });
+
+                if (!selectedCategoryStillValid) {
+                    categorySelect.value = "";
+                }
+            }
+
+            typeSelect.addEventListener("change", filterCategories);
+            filterCategories();
+        }
+
+        // Edit form toggle. Uses data attributes to avoid template JS syntax errors.
+        document.querySelectorAll(".edit-toggle").forEach(function(button) {
+            button.addEventListener("click", function() {
+                const transactionId = button.dataset.transactionId;
+                const form = document.getElementById(
+                    "edit-form-" + transactionId
+                );
+
+                if (form) {
+                    form.classList.toggle("visible");
+                }
+            });
+        });
+
+        // Budget progress bars. No Django widthratio template tag required.
+        document.querySelectorAll(".progress-fill").forEach(function(bar) {
+            const spent = Number(bar.dataset.spent);
+            const limit = Number(bar.dataset.limit);
+            const track = bar.parentElement;
+
+            let percentage = 0;
+
+            if (
+                Number.isFinite(spent) &&
+                Number.isFinite(limit) &&
+                limit > 0
+            ) {
+                percentage = Math.max(0, (spent / limit) * 100);
+            }
+
+            // Cap the visual bar at 100%; show the real percentage in the text.
+            bar.style.width = Math.min(percentage, 100) + "%";
+
+            if (percentage >= 100) {
+                bar.classList.add("over-budget");
+            } else if (percentage >= 80) {
+                bar.classList.add("warning");
+            }
+
+            if (track) {
+                track.setAttribute(
+                    "aria-valuenow",
+                    String(Math.min(Math.round(percentage), 100))
+                );
+            }
+
+            const card = bar.closest(".budget-card");
+            const percentLabel = card
+                ? card.querySelector(".budget-percent")
+                : null;
+
+            if (percentLabel) {
+                percentLabel.textContent =
+                    percentage.toFixed(0) + "% used";
+            }
+        });
+
+        // Category-wise expense chart.
+        const chartCanvas = document.getElementById("categoryChart");
+
+        if (chartCanvas && typeof Chart !== "undefined") 
+        {
+            let categoryData = [];
+
+            try {
+                categoryData = {{ category_expenses_json|safe }};
+            } catch (error) {
+                console.error("Could not load category expense data.", error);
+            }
+
+            if (Array.isArray(categoryData) && categoryData.length > 0) {
+                new Chart(chartCanvas, {
+                    type: "doughnut",
+                    data: {
+                        labels: categoryData.map(function(item) {
+                            return item.category;
+                        }),
+                        datasets: [{
+                            label: "Expenses",
+                            data: categoryData.map(function(item) {
+                                return item.amount;
+                            }),
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: "bottom"
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.label + ": ₹" +
+                                            Number(context.raw).toFixed(2);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }  
+    </script>
+
+</body>
+</html>
+
+
+
+
+
+
